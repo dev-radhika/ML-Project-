@@ -1,76 +1,68 @@
-# Software Defect Prediction
+#  Software Defect Prediction
 
-A final-year machine-learning project that predicts whether a **software class** is likely to be defect-prone from historical class-level metrics. It is designed as a testing-prioritisation aid, not as a source-code bug detector.
-
-## Problem statement
-Software teams have limited time for testing. This project explores whether historical software metrics can help rank classes for additional review and testing.
+A Machine Learning project that predicts whether a software class is likely to contain defects based on software code metrics. It also provides defect probability and risk level through an interactive Streamlit dashboard.
 
 ## Dataset
-- Source workbook: `Regenerated PROMISE and BPD Datasets.xlsx`
-- Selected sheet: `poi_3_0`
-- Included file: `data/poi_3_0.csv`
-- 442 rows; 8 columns (class name, six metrics, binary target).
-- Target: `Defect` (1 = labelled defective, 0 = labelled non-defective).
-- Features: `CBO`, `DCC`, `ExportCoupling`, `ImportCoupling`, `NOM`, `WMC`.
-- `ClassName` is retained for display but excluded from model training.
 
-### Feature meanings
-- **CBO**: Coupling Between Objects.
-- **DCC**: Direct Class Coupling.
-- **ExportCoupling / ImportCoupling**: coupling metrics describing outgoing/incoming dependencies in the source dataset.
-- **NOM**: Number of Methods.
-- **WMC**: Weighted Methods per Class.
+- **Dataset:** PROMISE/BPD – Apache POI 3.0
+- **Total records:** 442 software classes
+- **Target column:** `Defect` (0 = Non-defective, 1 = Defective)
+- **Features used:** CBO, DCC, ExportCoupling, ImportCoupling, NOM, WMC
 
-Metric definitions can vary slightly across dataset releases. Consult the original PROMISE/BPD dataset documentation when citing formal definitions.
+## Technologies & Libraries
 
-## Tech stack
-Python, pandas, NumPy, scikit-learn, matplotlib, seaborn, joblib, Streamlit.
+- Python
+- Pandas and NumPy
+- Scikit-learn
+- Joblib
+- Matplotlib
+- Streamlit
 
-## Run locally (Windows PowerShell)
+## Machine Learning
+
+The project compares Logistic Regression, Decision Tree, and Random Forest using GridSearchCV with 5-fold stratified cross-validation. Random Forest was selected as the best-performing model.
+
+## Model Performance
+
+| Metric    | Score |
+| --------- | ----: |
+| Accuracy  | 79.8% |
+| Precision | 83.1% |
+| Recall    | 86.0% |
+| F1-score  | 84.5% |
+| ROC-AUC   | 83.2% |
+
+## Key Features
+
+- Predicts defective or non-defective software classes.
+- Displays defect probability and risk level.
+- Provides feature-importance explanations.
+- Allows CSV and Excel dataset uploads.
+- Displays evaluation metrics and confusion matrix when actual labels are available.
+- Supports downloading prediction results as CSV.
+
+## Run Locally
+
+```bash
+git clone <your-repository-url>
+cd Software-Defect-Prediction
+
+python -m venv .venv
+```
+
+Activate the environment:
+
 ```powershell
-# 1. Extract the ZIP and open the extracted project folder in VS Code
-# 2. Create a virtual environment
-py -m venv .venv
 .venv\Scripts\Activate.ps1
+```
 
-# 3. Install dependencies
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+Install dependencies and run:
 
-# 4. Train, compare and evaluate models
-python src/train_model.py
-
-# 5. Start the dashboard
+```bash
+pip install -r requirements.txt
 python -m streamlit run app.py
 ```
-If PowerShell blocks activation, use `.\.venv\Scripts\python.exe -m python -m pip install -r requirements.txt`, then `.\.venv\Scripts\python.exe src\train_model.py` and `.\.venv\Scripts\python.exe -m python -m streamlit run app.py`.
 
-## Methodology
-1. Split data into stratified 80% training and 20% test sets.
-2. Use 5-fold stratified cross-validation **only on the training set** to tune Logistic Regression, Decision Tree and Random Forest.
-3. Select the model by mean cross-validation F1-score.
-4. Evaluate the selected model once on the held-out test set.
-5. Save accuracy, precision, recall, F1, balanced accuracy, ROC-AUC, classification report, confusion matrix and permutation importance.
+## Project Goal
 
-This avoids choosing a model based on test-set performance. Do not repeatedly tune against the held-out test score.
-
-## Outputs generated after training
-- `models/defect_model.joblib`
-- `outputs/metrics.json`
-- `outputs/model_comparison.csv`
-- `outputs/classification_report.csv`
-- `outputs/confusion_matrix.png`
-- `outputs/feature_importance.csv`
-
-These are generated locally and excluded from Git by default. Commit them only if your instructor/repository workflow requires it.
-
-## Limitations (important for viva)
-- This predicts at the **class/module level**. It does not scan source code, find a bug's line number, execute code, or identify the root cause.
-- The labels represent historical dataset annotations. A prediction is not proof that a class contains a defect.
-- The dataset is relatively small and comes from one project/version. Performance may not generalise to other software projects.
-- Metrics can be correlated; permutation importance is model-dependence, not causation.
-- Risk thresholds are illustrative and need validation with practitioners.
-- Report the actual test metrics generated by your run. Never promise 85%+ accuracy or alter the test split to inflate the score.
-
-## Suggested GitHub repository description
-Explainable machine-learning prototype for class-level software defect prediction and testing prioritisation using PROMISE metrics, scikit-learn and Streamlit.
+To demonstrate how machine learning and explainability techniques can help identify potentially defective software components during software development.
